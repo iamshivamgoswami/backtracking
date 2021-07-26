@@ -1,18 +1,25 @@
+import collections
 class Solution:
-    def combine(self, n: int, k: int) -> List[List[int]]:
-        nums = [i for i in range(1, n + 1)]
-        ans = []
+    def combinationSum2(self, arr, target) :
+        ans=[]
+        c=collections.Counter(arr)
+        c=[(k,v) for k,v in c.items()]
+        def func(pos,summ=0,tmp=[]):
+            if summ==target:
+                    ans.append(sorted(tmp[:]))
+            elif summ>target:
+                return
+            for i in range(pos,len(c)):
+                curr_element,freq=c[i]
+                if freq<=0:
+                    continue
+                tmp.append(curr_element)
+                c[i]=(curr_element,freq-1)
+                func(i,summ+curr_element)
+                tmp.pop()
+                c[i]=(curr_element,freq)
 
-        def solve(pos, op=[]):
-            if len(op)==k:
 
-                ans.append(op[:])
 
-            for i in range(pos, len(s)):
-                op.append(nums[i])
-                solve(i + 1)
-                op.pop()
-
-        solve(0)
-        return ans
-
+        func(0)
+        return(ans)
