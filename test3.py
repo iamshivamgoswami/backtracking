@@ -1,25 +1,60 @@
+import collections
 class Solution:
-    def combinationSum3(self, k: int, n: int) -> List[List[int]]:
-        arr = [i for i in range(1, 10)]
-        c=[(i,1) for i in range(1,10)]
-        ans=[]
-        target = n
-        def func(pos=0,summ=0,tmp=[]):
-            if len(tmp)==k and summ==target:
-                ans.append(tmp[:])
-            if summ>target:
-                return
-            if len(tmp)>k:
-                return
-            for i in range(pos,len(arr)):
-                curr_element,freq=c[i]
-                if freq<=0:
-                    continue
-                tmp.append(arr[i])
-                c[i]=(curr_element,freq-1)
-                func(i,summ+curr_element,tmp)
-                tmp.pop()
-                c[i]=(curr_element,freq)
+    def solveSudoku(self, board: List[List[str]]) -> None:
+        def could_place(d,row,col):
+            return not (d in rows[row] or d in cols[col] or d in boxes[box_index(row,col)])
 
-        func()
-        return ans
+        def place_number(d,row,col):
+
+            rows[row][d]+=1
+            cols[col][d]+=1
+            boxes[box_index(row,col)][d]+=1
+            board[row][col]=str(d)
+
+        def remove_number(d,row,col):
+            del rows[row][d]
+            del cols[col][d]
+            del boxes[box_index(row, col)][d]
+            board[row][col] = "."
+
+        def place_next_number(row,col):
+            if col==8 and row==8:
+                nonlocal sudoku_solved
+                sudoku_solved=True
+            else:
+                if col==8:
+                    backtrack(row+1,0)
+                else:
+                    backtrack(row,col+1)
+
+        def box_index(row,col):
+            return (row//3)*3 +col//3
+
+        def backtrack(row=0,col=0):
+            if board[row][col]==".":
+                for d in range(1,10):
+                    if could_place(d,row,col):
+                        place_number(d,row,col)
+                        place_next_number(row,col)
+                        if not sudoku_solved:
+                            remove_number(d,row,col)
+            else:
+                place_next_number(row,col)
+        rows=[collections.defaultdict(int) for i in range(9)]
+        cols=[collections.defaultdict(int) for i in range(9)]
+        boxes=[collections.defaultdict(int) for i in range(9)]
+
+
+
+        sudoku_solved=False
+        for i in range(9):
+            for j in range(9):
+                if board[i][j]!=".":
+                    d=int(board[i][j])
+                    place_number(d,i,j)
+
+
+
+        backtrack()
+
+
